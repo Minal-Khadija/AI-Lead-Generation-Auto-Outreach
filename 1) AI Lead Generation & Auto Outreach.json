@@ -1,0 +1,374 @@
+{
+  "name": "1) AI Lead Generation & Auto Outreach",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Lead Generation",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Company"
+            },
+            {
+              "fieldLabel": "Budget",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Company member",
+              "fieldType": "checkbox",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "5 to 10"
+                  },
+                  {
+                    "option": "20 to 30"
+                  },
+                  {
+                    "option": "40 to 100"
+                  },
+                  {
+                    "option": "more then 100"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "a5fad953-aefd-41ac-9b93-a64b7ae461d7",
+      "name": "On form submission",
+      "webhookId": "5799d424-0009-46ff-9e38-9a7aaab9a547"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst budget = parseInt(data.Budget) || 0;\nconst company = data.Company || '';\nconst members = data['Company member'] || '';\n\nlet quality = 'cold';\n\n// HOT: budget >= 100000 OR members more than 40\nif (budget >= 100000 || members === 'more then 100' || members === '40 to 100') {\n  quality = 'hot';\n}\n\nreturn [{\n  json: {\n    name: data.Name,\n    email: data.Email,\n    company: company,\n    budget: budget,\n    company_members: members,\n    lead_quality: quality,\n    submitted_at: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        -16
+      ],
+      "id": "dbff212c-2384-4391-974f-2879719de524",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1bf2eaa7-41d5-4d74-a4e9-faedee28a233",
+              "leftValue": "={{ $json.lead_quality }}",
+              "rightValue": "hot",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        -32
+      ],
+      "id": "db9931e8-0ebc-4874-a2a9-5ccc001ac4f6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "=Thank you {{ $json.Name }}!",
+        "message": "=<h2>Thank you for contacting us!</h2>\n<p>Dear {{ $json.Name }},</p>\n<p>We received your inquiry!</p>\n<p>Our team will contact you within 24-48 hours.</p>\n<p><b>Company:</b>{{ $json.Company }} </p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        112
+      ],
+      "id": "58af51d8-460f-44d6-8217-b052d0d8ff63",
+      "name": "Send a message",
+      "webhookId": "086c3523-a4de-44ef-94a6-fe4024e69670",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "SgwyZH5pt7ejqqhw",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "= Welcome VIP Client {{ $json.Name }}: ",
+        "message": "=<h2>🔥 You are our VIP Client!</h2> <p>Dear {{ $json.Name }},</p> <p>Thank you for your interest!</p> <p>Our senior team will contact you within 1 hour!</p> <p><b>Budget:</b> {{ $json.Budget }}</p> <p><b>Company:</b> {{ $json.Company }}</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        -96
+      ],
+      "id": "1e0c10e9-3f02-4ff8-9b17-ff6593ff6127",
+      "name": "Send a message1",
+      "webhookId": "ea3ab74c-b7ca-48d9-bc21-b34809f56771",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "SgwyZH5pt7ejqqhw",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "11qTSnZz1QebjT2NrWRxoax3PZ1HH_HqBhPPknZuwt58",
+          "mode": "list",
+          "cachedResultName": "auto-data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11qTSnZz1QebjT2NrWRxoax3PZ1HH_HqBhPPknZuwt58/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 362598531,
+          "mode": "list",
+          "cachedResultName": "Sheet6",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11qTSnZz1QebjT2NrWRxoax3PZ1HH_HqBhPPknZuwt58/edit#gid=362598531"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.name }}",
+            "Email": "={{ $json.email }}",
+            "Company": "={{ $json.company }}",
+            "Budget": "={{ $json.budget }}",
+            "Company member": "={{ $json.company_members }}",
+            "lead_quality": "={{ $json.lead_quality }}",
+            "submitted_a": "={{ $json.submitted_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company member",
+              "displayName": "Company member",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead_quality",
+              "displayName": "lead_quality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "submitted_a",
+              "displayName": "submitted_a",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -32
+      ],
+      "id": "59e8ef07-6b1f-4db1-a72d-ed27193898f2",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1XWLqCj30RqQFr4y",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AU119DUTT",
+          "mode": "list",
+          "cachedResultName": "minal"
+        },
+        "text": "=🚨 *VIP LEAD ALERT* 🚨\n━━━━━━━━━━━━━━━━━━━━━━\n\n👤 *Name:* {{ $('On form submission').item.json.Name }}\n📧 *Email:* {{ $('On form submission').item.json.Email }}\n🏢 *Company:* {{ $('On form submission').item.json.Company }}\n💰 *Budget:* ${{ $('On form submission').item.json.Budget }}\n👥 *Team Size:* {{ $('On form submission').item.json['Company member'][0] }}\n\n🕐 *Time:* {{ $('On form submission').item.json.submittedAt }}\n\n━━━━━━━━━━━━━━━━━━━━━━\n🔥 *This is a HIGH VALUE lead!*\n📞 *Please contact within 1 hour!*\n━━━━━━━━━━━━━━━━━━━━━━",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        864,
+        -96
+      ],
+      "id": "628682b0-df3f-4313-9f68-944d83786ab6",
+      "name": "Send a message2",
+      "webhookId": "72165c9a-95a7-4b92-b531-e9294e047c96",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "WEDI9lfAEGxHdo2u",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "availableInMCP": false
+  },
+  "versionId": "5d11c743-0aab-492d-a074-c77271dc71f7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fbc00d114bbd1def22ade720b498f533e608d11288af8ee44a6bbc5d1988e16e"
+  },
+  "id": "9WS6J8UedK5J4lSB",
+  "tags": []
+}
